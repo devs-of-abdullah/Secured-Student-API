@@ -1,0 +1,6 @@
+@Secured_Student_API_HostAddress = http://localhost:5034
+
+GET {{Secured_Student_API_HostAddress}}/Students/
+Accept: application/json
+
+###
