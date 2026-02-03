@@ -57,3 +57,41 @@
 *If you can’t see it, you can’t secure it.*
 
 ---
+## Encryption
+
+- Converts readable data (plaintext) into unreadable form (ciphertext)
+- Uses a key
+- Reversible (you can get the original data back with the key)
+- Used for confidentiality
+
+**Example uses**
+
+- HTTPS (TLS)
+- Encrypting files at database 
+- Secure messages
+
+## Encoding
+
+- Converts data into another format for transport or compatibility
+- Uses no key
+- Reversible by design
+- Not security
+
+**Example uses**
+
+- Base64
+- URL encoding
+- UTF-8
+
+## Hashing
+
+- Converts data into a fixed-length digest
+- Uses no key
+- One-way (irreversible)
+- Used for integrity and verification
+
+**Example uses**
+
+- Password storage
+- File integrity checks
+- Digital signatures (hash part)
