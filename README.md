@@ -1,8 +1,7 @@
 # Secured Student API
 
-## Layer 1 — Foundation
+## Layer 1 - HTTPS + CORS Foundation
 
-- HTTPS + CORS Foundation
 - Encrypted communication (TLS)
 - Controlled browser access
 - Safe data transport
@@ -49,7 +48,7 @@
 
 *Security under attack conditions.*
 
-## Layer 7 — Logging & Auditing
+## Layer 7 - Logging & Auditing
 
 - Track security events
 - Audit admin actions
