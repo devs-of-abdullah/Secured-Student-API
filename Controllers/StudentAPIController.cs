@@ -27,7 +27,7 @@ namespace StudentApi.Controllers
             return Ok(StudentDataSimulation.StudentsList); 
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("Passed",Name = "GetPassedStudents")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -45,7 +45,7 @@ namespace StudentApi.Controllers
             return Ok(passedStudents);
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("AverageGrade", Name = "GetAverageGrade")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -83,7 +83,7 @@ namespace StudentApi.Controllers
             return Ok(student);
         }
 
-        [Authorize]
+        [Authorize (Roles = "admin")]
         [HttpPost(Name = "AddStudent")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -101,7 +101,7 @@ namespace StudentApi.Controllers
 
         }
 
-        [Authorize]
+        [Authorize (Roles ="admin")]
         [HttpDelete("{id}", Name = "DeleteStudent")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -123,7 +123,7 @@ namespace StudentApi.Controllers
             return Ok($"Student with ID {id} has been deleted.");
         }
 
-        [Authorize]
+        [Authorize (Roles = "admin")]
         [HttpPut("{id}", Name = "UpdateStudent")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

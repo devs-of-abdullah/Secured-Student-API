@@ -5,13 +5,9 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// =======================
-// Services
-// =======================
 
 builder.Services.AddControllers();
 
-// 🔐 JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
 {
@@ -35,7 +31,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// 📘 Swagger + Authorize Button
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -45,7 +40,6 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1"
     });
 
-    // 🔑 JWT Bearer config for Swagger
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -74,9 +68,7 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// =======================
-// Middleware
-// =======================
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -86,7 +78,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// ⚠️ ORDER IS CRITICAL
 app.UseAuthentication();
 app.UseAuthorization();
 
