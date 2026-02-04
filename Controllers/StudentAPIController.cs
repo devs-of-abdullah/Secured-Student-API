@@ -12,11 +12,11 @@ namespace StudentApi.Controllers
     public class StudentsController : ControllerBase 
     {
 
-        
+
+        [Authorize]
         [HttpGet("All", Name ="GetAllStudents")] 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-
         public ActionResult<IEnumerable<Student>> GetAllStudents() 
         {
 
@@ -27,8 +27,8 @@ namespace StudentApi.Controllers
             return Ok(StudentDataSimulation.StudentsList); 
         }
 
+        [Authorize]
         [HttpGet("Passed",Name = "GetPassedStudents")]
-
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<IEnumerable<Student>> GetPassedStudents()
@@ -45,15 +45,12 @@ namespace StudentApi.Controllers
             return Ok(passedStudents);
         }
 
+        [Authorize]
         [HttpGet("AverageGrade", Name = "GetAverageGrade")]
-
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-
         public ActionResult<double> GetAverageGrade()
         {
-
-
             if (StudentDataSimulation.StudentsList.Count == 0)
             {
                 return NotFound("No students found.");
@@ -64,12 +61,11 @@ namespace StudentApi.Controllers
         }
 
 
+        [Authorize]
         [HttpGet("{id}", Name = "GetStudentById")]
-        
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-
         public ActionResult<Student> GetStudentById(int id)
         {
 
@@ -87,7 +83,7 @@ namespace StudentApi.Controllers
             return Ok(student);
         }
 
-        
+        [Authorize]
         [HttpPost(Name = "AddStudent")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -105,6 +101,7 @@ namespace StudentApi.Controllers
 
         }
 
+        [Authorize]
         [HttpDelete("{id}", Name = "DeleteStudent")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -126,6 +123,7 @@ namespace StudentApi.Controllers
             return Ok($"Student with ID {id} has been deleted.");
         }
 
+        [Authorize]
         [HttpPut("{id}", Name = "UpdateStudent")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
