@@ -74,11 +74,7 @@ namespace StudentApi.Controllers
 
 
         [HttpGet("{id}", Name = "GetStudentById")]
-        public async Task<ActionResult<Student>> GetStudentById(
-            int id,
-
-           
-            [FromServices] IAuthorizationService authorizationService)
+        public async Task<ActionResult<Student>> GetStudentById(int id, [FromServices] IAuthorizationService authorizationService)
         {
             
             if (id < 1)
@@ -93,10 +89,7 @@ namespace StudentApi.Controllers
                 return NotFound("Student not found.");
 
         
-            var authResult = await authorizationService.AuthorizeAsync(
-                User,
-                id,
-                "StudentOwnerOrAdmin");
+            var authResult = await authorizationService.AuthorizeAsync(User, id, "StudentOwnerOrAdmin");
 
          
             if (!authResult.Succeeded)
