@@ -1,63 +1,60 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using StudentApi.DataSimulation;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using Secured_Student_API.Model;
+using Microsoft.AspNetCore.Identity.Data;
 
-
-namespace Secured_Student_API.Controllers
+namespace StudentApi.Controllers
 {
+ 
     [ApiController]
-    [Route("api/auth")]
+    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
+       
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest req)
+        public IActionResult Login([FromBody] LoginRequest request)
         {
-            if (req == null || string.IsNullOrEmpty(req.Email) || string.IsNullOrEmpty(req.Password))
-            {
-                return BadRequest("Email and password are required");
-            }
-
             var student = StudentDataSimulation.StudentsList
-                .FirstOrDefault(s => s.Email == req.Email);
+                .FirstOrDefault(s => s.Email == request.Email);
 
             if (student == null)
-            {
                 return Unauthorized("Invalid credentials");
-            }
 
-            // ✅ FIXED PASSWORD CHECK
-            if (!BCrypt.Net.BCrypt.Verify(req.Password, student.PasswordHash))
-            {
+      
+            bool isValidPassword =
+                BCrypt.Net.BCrypt.Verify(request.Password, student.PasswordHash);
+
+            if (!isValidPassword)
                 return Unauthorized("Invalid credentials");
-            }
 
-            // ✅ CORRECT CLAIMS
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, student.Id.ToString()),
+
                 new Claim(ClaimTypes.Email, student.Email),
+
                 new Claim(ClaimTypes.Role, student.Role)
             };
 
-            // ✅ MUST MATCH Program.cs / Startup.cs
             var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes("MY_VERY_SECRET_KEY_IS_HERE_0000000000000")
-            );
+                Encoding.UTF8.GetBytes("THIS_IS_A_VERY_SECRET_KEY_123456"));
 
+           
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+           
             var token = new JwtSecurityToken(
-                issuer: "StudentAPI",
-                audience: "StudentAPIUsers",
+                issuer: "StudentApi",
+                audience: "StudentApiUsers",
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(30),
+                expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: creds
             );
 
+        
             return Ok(new
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token)

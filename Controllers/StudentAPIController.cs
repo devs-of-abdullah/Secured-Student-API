@@ -1,40 +1,47 @@
-using Microsoft.AspNetCore.Mvc; 
+using Microsoft.AspNetCore.Mvc;
 using StudentApi.Models;
 using StudentApi.DataSimulation;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
-namespace StudentApi.Controllers 
+namespace StudentApi.Controllers
 {
+    [Authorize]
     [ApiController] 
+                    
     [Route("api/Students")]
 
     public class StudentsController : ControllerBase 
     {
 
-
-        [Authorize]
-        [HttpGet("All", Name ="GetAllStudents")] 
+        [Authorize(Roles = "Admin")] 
+        [HttpGet("All", Name = "GetAllStudents")] 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+
         public ActionResult<IEnumerable<Student>> GetAllStudents() 
         {
 
-            if (StudentDataSimulation.StudentsList.Count == 0) 
+            if (StudentDataSimulation.StudentsList.Count == 0)
             {
                 return NotFound("No Students Found!");
             }
-            return Ok(StudentDataSimulation.StudentsList); 
+            return Ok(StudentDataSimulation.StudentsList);
         }
 
-        [AllowAnonymous]
-        [HttpGet("Passed",Name = "GetPassedStudents")]
+        [AllowAnonymous] 
+        [HttpGet("Passed", Name = "GetPassedStudents")]
+
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+        
         public ActionResult<IEnumerable<Student>> GetPassedStudents()
 
         {
             var passedStudents = StudentDataSimulation.StudentsList.Where(student => student.Grade >= 50).ToList();
+           
 
             if (passedStudents.Count == 0)
             {
@@ -42,15 +49,19 @@ namespace StudentApi.Controllers
             }
 
 
-            return Ok(passedStudents);
+            return Ok(passedStudents); 
         }
 
-        [AllowAnonymous]
+        [AllowAnonymous] 
         [HttpGet("AverageGrade", Name = "GetAverageGrade")]
+
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+
         public ActionResult<double> GetAverageGrade()
         {
+
+
             if (StudentDataSimulation.StudentsList.Count == 0)
             {
                 return NotFound("No students found.");
@@ -61,29 +72,42 @@ namespace StudentApi.Controllers
         }
 
 
-        [Authorize]
+
         [HttpGet("{id}", Name = "GetStudentById")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<Student> GetStudentById(int id)
+        public async Task<ActionResult<Student>> GetStudentById(
+            int id,
+
+           
+            [FromServices] IAuthorizationService authorizationService)
         {
-
+            
             if (id < 1)
-            {
-                return BadRequest($"Not valid ID {id}");
-            }
+                return BadRequest("Invalid student id.");
 
-            var student = StudentDataSimulation.StudentsList.FirstOrDefault(s => s.Id == id);
+           
+            var student = StudentDataSimulation.StudentsList
+                .FirstOrDefault(s => s.Id == id);
+
+           
             if (student == null)
-            {
-                return NotFound($"Student with ID {id} not found.");
-            }
+                return NotFound("Student not found.");
 
+        
+            var authResult = await authorizationService.AuthorizeAsync(
+                User,
+                id,
+                "StudentOwnerOrAdmin");
+
+         
+            if (!authResult.Succeeded)
+                return Forbid(); 
+
+       
             return Ok(student);
         }
 
-        [Authorize (Roles = "admin")]
+
+        [Authorize(Roles = "Admin")] 
         [HttpPost(Name = "AddStudent")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -96,12 +120,13 @@ namespace StudentApi.Controllers
 
             newStudent.Id = StudentDataSimulation.StudentsList.Count > 0 ? StudentDataSimulation.StudentsList.Max(s => s.Id) + 1 : 1;
             StudentDataSimulation.StudentsList.Add(newStudent);
-            
+
             return CreatedAtRoute("GetStudentById", new { id = newStudent.Id }, newStudent);
 
         }
 
-        [Authorize (Roles ="admin")]
+      
+        [Authorize(Roles = "Admin")] 
         [HttpDelete("{id}", Name = "DeleteStudent")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -110,7 +135,7 @@ namespace StudentApi.Controllers
         {
             if (id < 1)
             {
-                return BadRequest($"Not valid ID {id}");
+                return BadRequest($"Not accepted ID {id}");
             }
 
             var student = StudentDataSimulation.StudentsList.FirstOrDefault(s => s.Id == id);
@@ -123,7 +148,8 @@ namespace StudentApi.Controllers
             return Ok($"Student with ID {id} has been deleted.");
         }
 
-        [Authorize (Roles = "admin")]
+        
+        [Authorize(Roles = "Admin")] 
         [HttpPut("{id}", Name = "UpdateStudent")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
