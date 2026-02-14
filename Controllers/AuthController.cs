@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Secured_Student_API.DTOs.Auth;
 using RefreshRequest = Secured_Student_API.DTOs.Auth.RefreshRequest;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace StudentApi.Controllers
 {
@@ -18,6 +19,8 @@ namespace StudentApi.Controllers
     {
        
         [HttpPost("login")]
+        [EnableRateLimiting("AuthLimiter")]
+
         public IActionResult Login([FromBody] LoginRequest request)
         {
             var student = StudentDataSimulation.StudentsList
@@ -79,6 +82,8 @@ namespace StudentApi.Controllers
             return Convert.ToBase64String(bytes);
         }
         [HttpPost("refresh")]
+        [EnableRateLimiting("AuthLimiter")]
+
         public IActionResult Refresh([FromBody] RefreshRequest request)
         {
             var student = StudentDataSimulation.StudentsList
@@ -113,7 +118,7 @@ namespace StudentApi.Controllers
                 issuer: "StudentApi",
                 audience: "StudentApiUsers",
                 claims: claims,
-                expires: DateTime.UtcNow.AddSeconds(10),
+                expires: DateTime.UtcNow.AddMinutes(30),
                 signingCredentials: creds
             );
 
